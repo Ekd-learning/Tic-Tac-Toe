@@ -14,6 +14,7 @@ const gameboard = (function () {
     if (validMove(row, col)) theBoard[row][col] = "O";
   };
   const checkLine = (arr) => {
+    console.log("checking victory... arr: ", arr);
     if (arr.every((value) => value > 0)) return 1;
     else if (arr.every((value) => value < 0)) return -1;
     else {
@@ -29,48 +30,69 @@ const gameboard = (function () {
       console.log(theLine);
     }
   };
-  const checkVictory = () => {
-    // check rows first
+
+  const checkRowsVictory = () => {
     for (let row = 0; row < theBoard.length; row++) {
-      let values = [0, 0, 0];
-      for (let col = 0; col < theBoard[row].length; col++) {
-        if (theBoard[row][col] === "X") values[col] = 1;
-        if (theBoard[row][col] === "O") values[col] = -1;
+      if (theBoard[row].every((el) => el === theBoard[row][0])) {
+        let retVal = 0;
+        if (theBoard[row][0] === "X") return 1;
+        if (theBoard[row][0] === "O") return -1;
       }
-      if (checkLine(values) === 1) return 1;
-      if (checkLine(values) === -1) return -1;
+      return 0;
     }
-    // check columns second
+  };
+  const checkColsVictory = () => {
+    let values = [0, 0, 0];
     for (let row = 0; row < theBoard.length; row++) {
-      let values = [0, 0, 0];
       for (let col = 0; col < theBoard[row].length; col++) {
-        if (theBoard[col][row] === "X") values[row] = 1;
-        if (theBoard[col][row] === "O") values[row] = -1;
+        if (theBoard[col][row] === "X") values[col] = 1;
+        if (theBoard[col][row] === "O") values[col] = -1;
       }
-      if (checkLine(values) === 1) return 1;
-      if (checkLine(values) === -1) return -1;
+      if (values.every((el) => el === 1)) return 1;
+      if (values.every((el) => el === -1)) return -1;
+      values = [0, 0, 0];
     }
-    // check left-to-right diagonal first
-    let values = [0, 0, 0]; // cant store it inside the row-forLoop as it will be refreshed
+    return 0;
+  };
+  const checkLeftToRightDiagonalVictory = () => {
+    let values = [0, 0, 0];
     for (let row = 0; row < theBoard.length; row++) {
       for (let col = 0; col < theBoard[row].length; col++) {
         if (row !== col) continue;
-        if (theBoard[row][col] === "X") values[col] = 1;
+        if (theBoard[row][col] === "X") values[row] = 1;
         if (theBoard[row][col] === "O") values[col] = -1;
       }
     }
-    if (checkLine(values) === 1) return 1;
-    if (checkLine(values) === -1) return -1;
-    // check right-to-left diagonal last
-    values = [0, 0, 0];
+    if (values.every((el) => el === 1)) return 1;
+    if (values.every((el) => el === -1)) return -1;
+    return 0;
+  };
+  const checkRightToLeftDiagonalVictory = () => {
+    let values = [0, 0, 0];
     for (let row = 0; row < theBoard.length; row++) {
       for (let col = 0; col < theBoard[row].length; col++) {
-        if (theBoard[row][theBoard.length - 1 - col] === "X") values[col] = 1;
-        if (theBoard[row][theBoard.length - 1 - col] === "O") values[col] = -1;
+        if (row !== theBoard[row].length - 1 - col) continue;
+        if (theBoard[row][col] === "X") values[row] = 1;
+        if (theBoard[row][col] === "O") values[col] = -1;
       }
     }
-    if (checkLine(values) === 1) return 1;
-    if (checkLine(values) === -1) return -1;
+    if (values.every((el) => el === 1)) return 1;
+    if (values.every((el) => el === -1)) return -1;
+    return 0;
+  };
+
+  const checkVictory = () => {
+    // console.log(
+    //   `Victory by rows: ${checkRowsVictory()} \n Victory by cols: ${checkColsVictory()} \n Victory from left to right diagonal: ${checkLeftToRightDiagonalVictory()} \n Victory from right to left diagonal: ${checkRightToLeftDiagonalVictory()}`
+    // );
+    let isVictory = checkRowsVictory();
+    if (Boolean(isVictory)) return isVictory;
+    isVictory = checkColsVictory();
+    if (Boolean(isVictory)) return isVictory;
+    isVictory = checkLeftToRightDiagonalVictory();
+    if (Boolean(isVictory)) return isVictory;
+    isVictory = checkRightToLeftDiagonalVictory();
+    if (Boolean(isVictory)) return isVictory;
     return 0;
   };
 
