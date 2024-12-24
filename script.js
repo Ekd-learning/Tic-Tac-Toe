@@ -1,4 +1,5 @@
 "use strict";
+let whoseTurn = true; // true = 1st player, false = 2nd player
 
 const gameboard = (function () {
   const theBoard = [
@@ -6,8 +7,12 @@ const gameboard = (function () {
     ["*", "*", "*"],
     ["*", "*", "*"],
   ];
-  const addX = (row, col) => (theBoard[row][col] = "X");
-  const addO = (row, col) => (theBoard[row][col] = "O");
+  const addX = (row, col) => {
+    if (validMove(row, col)) theBoard[row][col] = "X";
+  };
+  const addO = (row, col) => {
+    if (validMove(row, col)) theBoard[row][col] = "O";
+  };
   const checkLine = (arr) => {
     if (arr.every((value) => value > 0)) return 1;
     else if (arr.every((value) => value < 0)) return -1;
@@ -68,23 +73,33 @@ const gameboard = (function () {
     if (checkLine(values) === -1) return -1;
     return 0;
   };
-  return { addX, addO, checkVictory, printGameboard };
-})();
 
-gameboard.printGameboard();
-gameboard.addX(2, 0);
-gameboard.addX(1, 1);
-gameboard.addX(0, 2);
-console.log("victory? :", gameboard.checkVictory() ? "Yay" : "Nah");
-gameboard.printGameboard();
+  const validMove = (row, col) => (theBoard[row][col] === "*" ? true : false);
+  return { addX, addO, checkVictory, printGameboard, validMove };
+})();
 
 const displayController = (function () {
   const theContainer = document.querySelector(`.tictactoe-container`);
-  const createElement = (value = " ") => `<p>${value}</p>`;
+  const createElement = (value = " ") =>
+    `<img src='./images/${value}.png' width='100%' height='100%'>`;
   const placeElement = (row, col, value = " ") => {
     const theCard = document.getElementById(`${row + "" + col}`);
+    console.log("child nodes", theCard.childNodes);
+    if (theCard.childNodes.length !== 0) return;
     theCard.insertAdjacentHTML("beforeend", createElement(value));
   };
-
   return { placeElement };
 })();
+document.addEventListener("click", function (e) {
+  const target = e.target.closest(".card");
+  console.log("target: ", target);
+  const row = target.getAttribute("id").charAt(0);
+  const col = target.getAttribute("id").charAt(1);
+  if (gameboard.validMove(row, col)) {
+    displayController.placeElement(row, col, whoseTurn ? "X" : "O");
+    whoseTurn ? gameboard.addX(row, col) : gameboard.addO(row, col);
+    gameboard.printGameboard();
+    console.log("Anybody won? ", gameboard.checkVictory());
+    whoseTurn = whoseTurn ? false : true;
+  }
+});
