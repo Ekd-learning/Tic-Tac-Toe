@@ -7,6 +7,9 @@ const gameboard = (function () {
     ["*", "*", "*"],
     ["*", "*", "*"],
   ];
+  let player1_score = 0;
+  let player2_score = 0;
+
   const clearTheBoard = () => {
     for (let row = 0; row < theBoard.length; row++) {
       for (let col = 0; col < theBoard[row].length; col++)
@@ -115,26 +118,41 @@ const displayController = (function () {
   };
 
   const clearTheBoard = () =>
-    [...theContainer.children].forEach((card) => card.firstChild.remove());
+    [...theContainer.children].forEach((card) => card.firstChild?.remove());
 
   return { placeElement, clearTheBoard };
 })();
 
 document.addEventListener("click", function (e) {
   const target = e.target.closest(".card");
+  if (!target) return;
   const row = target.getAttribute("id").charAt(0);
   const col = target.getAttribute("id").charAt(1);
   if (gameboard.validMove(row, col)) {
     displayController.placeElement(row, col, whoseTurn ? "X" : "O");
     whoseTurn ? gameboard.addX(row, col) : gameboard.addO(row, col);
     gameboard.printGameboard();
-    console.log("Anybody won? ", gameboard.checkVictory());
+    if (gameboard.checkVictory() > 0) {
+      player1_score++;
+    }
+    if (gameboard.checkVictory() < 0) {
+      player2_score++;
+    }
     whoseTurn = whoseTurn ? false : true;
   }
 });
 document.querySelector(`#clearTheBoard`).addEventListener("click", function () {
-  console.log("clearing the board");
   gameboard.clearTheBoard();
   console.log(gameboard.printGameboard());
   displayController.clearTheBoard();
+});
+document.querySelector(`#start`).addEventListener("click", function () {
+  const player1_name = document.querySelector(`#player1_name`).value;
+  if (!player1_name) return;
+  const player2_name = document.querySelector(`#player2_name`).value;
+  if (!player2_name) return;
+
+  document.querySelector(`.input_container`).classList.add("hidden");
+  document.querySelector(`#clearTheBoard`).classList.remove("hidden");
+  document.querySelector(`.tictactoe-container`).classList.remove("hidden");
 });

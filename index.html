@@ -7,8 +7,31 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <button id="clearTheBoard">Clear The Board</button>
-    <div class="tictactoe-container">
+    <div class="input_container">
+      <label for="player1Name" class="label">Player 1 Name ( X )</label>
+      <br />
+      <input
+        type="text"
+        id="player1_name"
+        name="player1_name"
+        minlength="2"
+        maxlength="20"
+      />
+      <br />
+      <label for="player2Name" class="label">Player 2 Name ( O )</label>
+      <br />
+      <input
+        type="text"
+        id="player2_name"
+        name="player2_name"
+        minlength="2"
+        maxlength="20"
+      />
+      <br />
+      <button type="submit" id="start">Start the Game!</button>
+    </div>
+    <button class="hidden" id="clearTheBoard">Restart a Match</button>
+    <div class="tictactoe-container hidden">
       <div class="card" id="00"></div>
       <div class="card" id="01"></div>
       <div class="card" id="02"></div>
