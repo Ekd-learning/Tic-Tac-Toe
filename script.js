@@ -77,3 +77,14 @@ gameboard.addX(1, 1);
 gameboard.addX(0, 2);
 console.log("victory? :", gameboard.checkVictory() ? "Yay" : "Nah");
 gameboard.printGameboard();
+
+const displayController = (function () {
+  const theContainer = document.querySelector(`.tictactoe-container`);
+  const createElement = (value = " ") => `<p>${value}</p>`;
+  const placeElement = (row, col, value = " ") => {
+    const theCard = document.getElementById(`${row + "" + col}`);
+    theCard.insertAdjacentHTML("beforeend", createElement(value));
+  };
+
+  return { placeElement };
+})();
