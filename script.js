@@ -7,6 +7,12 @@ const gameboard = (function () {
     ["*", "*", "*"],
     ["*", "*", "*"],
   ];
+  const clearTheBoard = () => {
+    for (let row = 0; row < theBoard.length; row++) {
+      for (let col = 0; col < theBoard[row].length; col++)
+        theBoard[row][col] = "*";
+    }
+  };
   const addX = (row, col) => {
     if (validMove(row, col)) theBoard[row][col] = "X";
   };
@@ -14,7 +20,6 @@ const gameboard = (function () {
     if (validMove(row, col)) theBoard[row][col] = "O";
   };
   const checkLine = (arr) => {
-    console.log("checking victory... arr: ", arr);
     if (arr.every((value) => value > 0)) return 1;
     else if (arr.every((value) => value < 0)) return -1;
     else {
@@ -82,9 +87,6 @@ const gameboard = (function () {
   };
 
   const checkVictory = () => {
-    // console.log(
-    //   `Victory by rows: ${checkRowsVictory()} \n Victory by cols: ${checkColsVictory()} \n Victory from left to right diagonal: ${checkLeftToRightDiagonalVictory()} \n Victory from right to left diagonal: ${checkRightToLeftDiagonalVictory()}`
-    // );
     let isVictory = checkRowsVictory();
     if (Boolean(isVictory)) return isVictory;
     isVictory = checkColsVictory();
@@ -97,24 +99,29 @@ const gameboard = (function () {
   };
 
   const validMove = (row, col) => (theBoard[row][col] === "*" ? true : false);
-  return { addX, addO, checkVictory, printGameboard, validMove };
+  return { addX, addO, checkVictory, printGameboard, validMove, clearTheBoard };
 })();
 
 const displayController = (function () {
   const theContainer = document.querySelector(`.tictactoe-container`);
+
   const createElement = (value = " ") =>
     `<img src='./images/${value}.png' width='100%' height='100%'>`;
+
   const placeElement = (row, col, value = " ") => {
     const theCard = document.getElementById(`${row + "" + col}`);
-    console.log("child nodes", theCard.childNodes);
     if (theCard.childNodes.length !== 0) return;
     theCard.insertAdjacentHTML("beforeend", createElement(value));
   };
-  return { placeElement };
+
+  const clearTheBoard = () =>
+    [...theContainer.children].forEach((card) => card.firstChild.remove());
+
+  return { placeElement, clearTheBoard };
 })();
+
 document.addEventListener("click", function (e) {
   const target = e.target.closest(".card");
-  console.log("target: ", target);
   const row = target.getAttribute("id").charAt(0);
   const col = target.getAttribute("id").charAt(1);
   if (gameboard.validMove(row, col)) {
@@ -124,4 +131,10 @@ document.addEventListener("click", function (e) {
     console.log("Anybody won? ", gameboard.checkVictory());
     whoseTurn = whoseTurn ? false : true;
   }
+});
+document.querySelector(`#clearTheBoard`).addEventListener("click", function () {
+  console.log("clearing the board");
+  gameboard.clearTheBoard();
+  console.log(gameboard.printGameboard());
+  displayController.clearTheBoard();
 });
